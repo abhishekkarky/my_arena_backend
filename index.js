@@ -34,7 +34,7 @@ connectDB();
 const port = process.env.PORT;
 
 // // creating user routes
-// app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/user", require("./routes/user/userRoutes"));
 
 // // creating subscriber routes
 // app.use("/api/subscriber", require("./routes/subscriberRoutes"));

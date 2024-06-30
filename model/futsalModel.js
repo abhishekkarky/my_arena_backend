@@ -31,6 +31,10 @@ const futsalSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
+    timeSlots: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "timeSlots",
+    },
   },
   { timestamps: true }
 );

@@ -10,6 +10,12 @@ const bookingSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
+    from: {
+      type: Date,
+    },
+    to: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
