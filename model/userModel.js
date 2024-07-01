@@ -6,25 +6,57 @@ const userSchema = mongoose.Schema(
       type: String,
       trim: true,
     },
-    name: {
+    fullName: {
       type: String,
     },
     email: {
       type: String,
-      unique: true,
     },
     address: {
       type: String,
     },
     number: {
       type: String,
+      unique: true,
+    },
+    country: {
+      type: String,
+    },
+    city: {
+      type: String,
     },
     password: {
       type: String,
     },
-    isAdmin: {
+    otp: {
+      type: String,
+      default: false,
+    },
+    otpTimestamp: {
+      type: String,
+      default: false,
+      required: false,
+    },
+    isVerified: {
       type: Boolean,
       default: false,
+    },
+    fcmToken: [
+      {
+        type: String,
+      },
+    ],
+    userTimeZone: {
+      type: String,
+    },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    role: {
+      type: String,
+      default: "customer",
+      enum: ["customer", "vendor", "superadmin"],
     },
   },
   { timestamps: true }

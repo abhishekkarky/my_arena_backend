@@ -33,8 +33,24 @@ connectDB();
 
 const port = process.env.PORT;
 
-// // creating user routes
+// creating user routes
 app.use("/api/user", require("./routes/user/userRoutes"));
+
+// creating futsal routes for vendor
+app.use('/api/futsal', require('./routes/admin/vendor/futsalRoutes'))
+
+// creating booking routes for vendor
+app.use('/api/booking', require('./routes/admin/vendor/bookingRoutes'))
+
+// creating notification routes for vendor
+app.use('/api/notification', require('./routes/admin/vendor/notificationRoutes'))
+
+// creating paymentLog routes for vendor
+app.use('/api/paymentLog', require('./routes/admin/vendor/paymentLogRoutes'))
+
+// creating futsal routes for admin
+app.use('/api/futsal', require('./routes/admin/superadmin/futsalRoutes'))
+
 
 // // creating subscriber routes
 // app.use("/api/subscriber", require("./routes/subscriberRoutes"));

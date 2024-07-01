@@ -10,11 +10,22 @@ const bookingSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
-    from: {
-      type: Date,
+    vendor: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
     },
-    to: {
-      type: Date,
+    date: {
+      type: String,
+    },
+    timeSlot: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "timeSlots",
+      },
+    ],
+    paid: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

@@ -9,7 +9,17 @@ const timeSlotSchema = mongoose.Schema(
       type: String,
     },
     dayOfWeek: {
-      type: String,
+      type: Number,
+      min: 0,
+      max: 6,
+    },
+    futsal: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "futsals",
+    },
+    available: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
