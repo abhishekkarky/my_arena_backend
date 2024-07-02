@@ -1,9 +1,11 @@
+const futsals = require("../../../model/futsalModel");
 const Futsal = require("../../../model/futsalModel");
+const moment = require("moment");
 
 const getAllFutsalsForAdmin = async (req, res) => {
-  const searchQuery = req.query.searchQuery;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
+  const searchQuery = req.query.searchQuery;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -11,40 +13,84 @@ const getAllFutsalsForAdmin = async (req, res) => {
   try {
     let query = {};
 
-    if (searchQuery && searchQuery !== "undefined") {
-      const regex = new RegExp(searchQuery, "i");
-      query.name = regex || "";
-    }
-
     if (startDate && endDate) {
-      const start = moment(startDate).startOf("day").toDate();
-      const end = moment(endDate).endOf("day").toDate();
-      query.createdAt = {
-        $gte: start,
-        $lte: end,
-      };
+      const start = moment(endDate).startOf("day").toDate();
+      const end = moment(startDate).endOf("day").toDate();
+      query.createdAt = { $gte: start, $lte: end };
     }
 
-    const futsals = await Futsal.find()
-      .populate("timeSlots")
-      .limit(limit)
-      .skip(skip)
-      .sort({ _id: -1 });
+    if (searchQuery && searchQuery !== "undefined") {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+        { location: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
 
     const total = await Futsal.countDocuments(query);
+    const futsalData = await Futsal.find(query)
+      .limit(limit)
+      .skip(skip)
+      .sort({ _id: -1 })
+      .populate("addedBy")
+      .populate("timeSlots");
 
     res.status(200).json({
       success: true,
-      futsals: futsals,
       totalCount: total,
+      futsals: futsalData,
+    });
+  } catch (error) {
+    console.log("Error retrieving futsal data:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const futsalCountAndGrowthRate = async (req, res) => {
+  try {
+    const count = await Futsal.countDocuments();
+
+    const previousMonthStart = moment()
+      .subtract(1, "months")
+      .startOf("month")
+      .toDate();
+    const previousMonthEnd = moment()
+      .subtract(1, "months")
+      .endOf("month")
+      .toDate();
+
+    const currentMonthStart = moment().startOf("month").toDate();
+    const currentMonthEnd = moment().endOf("month").toDate();
+
+    const previousMonthCount = await Futsal.countDocuments({
+      createdAt: { $gte: previousMonthStart, $lte: previousMonthEnd },
+    });
+
+    const currentMonthCount = await Futsal.countDocuments({
+      createdAt: { $gte: currentMonthStart, $lte: currentMonthEnd },
+    });
+
+    const growthRate =
+      ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100;
+
+    res.status(200).json({
+      success: true,
+      message: "Count and growth of futsals fetched successfully",
+      count: count,
+      growth: growthRate,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Server Error",
     });
   }
 };
 
-module.exports = { getAllFutsalsForAdmin };
+module.exports = {
+  getAllFutsalsForAdmin,
+  futsalCountAndGrowthRate,
+};

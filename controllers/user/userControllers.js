@@ -258,7 +258,7 @@ const loginUser = async (req, res) => {
 
 const getUserById = async (req, res) => {
   const { id } = req.params;
-  console.log(req.params.id)
+  console.log(req.params.id);
   if (!id) {
     return res.status(403).json({
       success: false,
@@ -286,9 +286,183 @@ const getUserById = async (req, res) => {
   }
 };
 
+const uploadImage = async (req, res) => {
+  const userImage = req.file;
+  const id = req.params.id;
+
+  if (!userImage) {
+    return res.status(403).json({
+      success: false,
+      message: "Please provide an image!",
+    });
+  }
+
+  try {
+    const uploadedImage = userImage.originalname.replace(/\s/g, "_");
+    const userImageUrl = `${process.env.BACKEND_URL}/uploads/${uploadedImage}`;
+
+    const user = await users.findByIdAndUpdate(id, { userImageUrl });
+
+    res.status(200).json({
+      success: true,
+      message: "User image updated successfully",
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { fullName, email, address, number, userTimeZone } = req.body;
+  const id = req.params.id;
+
+  if (!fullName || !email || !address || !number) {
+    res.status(403).json({
+      success: false,
+      message: "Please fill all fields",
+    });
+  }
+  try {
+    const existingUser = await users.findById(id);
+    if (!existingUser) {
+      return res.status(403).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    const updatedUser = {
+      fullName: fullName,
+      email: email,
+      address: address,
+      number: number,
+      userTimeZone: userTimeZone ?? "Asia/Kathmandu",
+    };
+    const isIdentical =
+      existingUser.fullName === updatedUser.fullName &&
+      existingUser.email === updatedUser.email &&
+      existingUser.number === updatedUser.number &&
+      existingUser.address === updatedUser.address &&
+      existingUser.userTimeZone === updatedUser.userTimeZone;
+    if (isIdentical) {
+      return res.status(403).json({
+        success: false,
+        message: "No changes detected",
+      });
+    }
+    const user = await users.findByIdAndUpdate(id, updatedUser);
+    res.status(200).json({
+      success: true,
+      message: "User Details updated Successfully",
+      user: user,
+    });
+    console.log(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
+const updateUserPassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.json({
+        success: false,
+        message: "Please enter both old and new passwords",
+      });
+    }
+
+    const id = req.params.id;
+
+    const user = await users.findById(id);
+
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordMatch) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid current password",
+      });
+    }
+
+    const generateSalt = await bcrypt.genSalt(10);
+    const encryptedNewPassword = await bcrypt.hash(newPassword, generateSalt);
+
+    await users.findByIdAndUpdate(id, { password: encryptedNewPassword });
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+const storeFCMToken = async (req, res) => {
+  const { fcmToken } = req.body;
+  const id = req.user.id;
+
+  if (!fcmToken) {
+    return res.status(403).json({
+      success: false,
+      message: "Please provide a FCM token",
+    });
+  }
+  try {
+    const user = await users.findById(id);
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    await users.findByIdAndUpdate(id, {
+      $addToSet: { fcmToken: fcmToken },
+    });
+    res.status(200).json({
+      success: true,
+      message: "FCM token stored successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   numberVerification,
   getUserById,
+  uploadImage,
+  updateUser,
+  updateUserPassword,
+  storeFCMToken,
 };

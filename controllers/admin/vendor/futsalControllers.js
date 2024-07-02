@@ -1,6 +1,7 @@
 const Futsal = require("../../../model/futsalModel");
 const TimeSlot = require("../../../model/timeSlotModel");
 const moment = require("moment");
+const users = require("../../../model/userModel");
 
 const generateTimeSlots = (dayOfWeek, startTime, endTime) => {
   const slots = [];
@@ -76,6 +77,7 @@ const createFutsal = async (req, res) => {
     );
     savedFutsal.timeSlots = savedSlots.map((slot) => slot._id);
     await savedFutsal.save();
+    await users.findByIdAndUpdate(req.user.id, { $inc: { totalFutsals: 1 } });
 
     res.status(200).json({
       success: true,

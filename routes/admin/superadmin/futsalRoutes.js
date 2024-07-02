@@ -5,4 +5,6 @@ const ensureSuperAdmin = require("../../../middleware/ensureSuperAdmin");
 
 router.get("/all", authGuard, ensureSuperAdmin, futsalController.getAllFutsalsForAdmin);
 
+router.get("/countAndGrowth", authGuard, ensureSuperAdmin, futsalController.futsalCountAndGrowthRate);
+
 module.exports = router

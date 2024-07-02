@@ -58,6 +58,10 @@ const userSchema = mongoose.Schema(
       default: "customer",
       enum: ["customer", "vendor", "superadmin"],
     },
+    totalFutsals: {
+      type: Number,
+      default: 0,
+    }
   },
   { timestamps: true }
 );

@@ -48,9 +48,23 @@ app.use('/api/notification', require('./routes/admin/vendor/notificationRoutes')
 // creating paymentLog routes for vendor
 app.use('/api/paymentLog', require('./routes/admin/vendor/paymentLogRoutes'))
 
-// creating futsal routes for admin
-app.use('/api/futsal', require('./routes/admin/superadmin/futsalRoutes'))
+// creating futsal routes for superadmin
+app.use('/api/superadmin/futsal', require('./routes/admin/superadmin/futsalRoutes'))
 
+// creating user routes for superadmin
+app.use('/api/superadmin/user', require('./routes/admin/superadmin/userRoutes'))
+
+// creating vendor routes for superadmin
+app.use('/api/superadmin/vendor', require('./routes/admin/superadmin/vendorRoutes'))
+
+// creating paymentLog routes for superadmin
+app.use('/api/superadmin/paymentLogs', require('./routes/admin/superadmin/paymentLogsRoutes'))
+
+// creating booking routes for superadmin
+app.use('/api/superadmin/booking', require('./routes/admin/superadmin/bookingRoutes'))
+
+// creating notification routes for superadmin
+app.use('/api/superadmin/notification', require('./routes/admin/superadmin/notificationRoutes'))
 
 // // creating subscriber routes
 // app.use("/api/subscriber", require("./routes/subscriberRoutes"));
