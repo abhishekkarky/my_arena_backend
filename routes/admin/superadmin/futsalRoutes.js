@@ -7,4 +7,6 @@ router.get("/all", authGuard, ensureSuperAdmin, futsalController.getAllFutsalsFo
 
 router.get("/countAndGrowth", authGuard, ensureSuperAdmin, futsalController.futsalCountAndGrowthRate);
 
+router.delete("/delete/:id", authGuard, ensureSuperAdmin, futsalController.deleteFutsal);
+
 module.exports = router

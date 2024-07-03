@@ -1,7 +1,8 @@
 const Bookings = require("../../../model/bookingModel");
 const moment = require("moment");
 const users = require("../../../model/userModel");
-const timeSlots = require("../../../model/timeSlotModel");
+const paymentLogs = require("../../../model/paymentLogsModel");
+const futsals = require("../../../model/futsalModel");
 
 const addBooking = async (req, res) => {
   const userId = req.user.id;
@@ -30,11 +31,6 @@ const addBooking = async (req, res) => {
       });
     }
 
-    await timeSlots.updateMany(
-      { _id: { $in: timeSlot } },
-      { $set: { available: false } }
-    );
-
     const newBooking = new Bookings({
       user: checkUser._id,
       futsal: futsal,
@@ -45,6 +41,21 @@ const addBooking = async (req, res) => {
     });
 
     await newBooking.save();
+
+    if (req.body.paid === 'true') {
+      const populatedFutsal = await futsals.findOne({ _id: futsal });
+      const newPaymentLog = new paymentLogs({
+        by: checkUser._id,
+        vendor: userId,
+        futsal: futsal,
+        amount: populatedFutsal.price,
+      });
+      await newPaymentLog.save();
+    }
+
+    await users.findByIdAndUpdate(checkUser._id, {
+      $inc: { totalBookings: 1 },
+    });
 
     res.status(200).json({
       success: true,

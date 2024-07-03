@@ -1,25 +1,6 @@
 const Futsal = require("../../../model/futsalModel");
-const TimeSlot = require("../../../model/timeSlotModel");
 const moment = require("moment");
 const users = require("../../../model/userModel");
-
-const generateTimeSlots = (dayOfWeek, startTime, endTime) => {
-  const slots = [];
-  let startMoment = moment(startTime, "HH:mm");
-  let endMoment = moment(endTime, "HH:mm");
-
-  while (startMoment.isBefore(endMoment)) {
-    const endSlotMoment = moment(startMoment).add(1, "hours");
-    slots.push({
-      startTime: startMoment.format("HH:mm"),
-      endTime: endSlotMoment.format("HH:mm"),
-      dayOfWeek: dayOfWeek,
-    });
-    startMoment.add(1, "hours");
-  }
-
-  return slots;
-};
 
 const createFutsal = async (req, res) => {
   const futsalImage = req.file;
@@ -70,12 +51,6 @@ const createFutsal = async (req, res) => {
       endTime,
     });
     const savedFutsal = await newFutsal.save();
-
-    const slots = generateTimeSlots(dayOfWeek, startTime, endTime);
-    const savedSlots = await TimeSlot.insertMany(
-      slots.map((slot) => ({ ...slot, futsal: savedFutsal._id }))
-    );
-    savedFutsal.timeSlots = savedSlots.map((slot) => slot._id);
     await savedFutsal.save();
     await users.findByIdAndUpdate(req.user.id, { $inc: { totalFutsals: 1 } });
 
@@ -220,17 +195,6 @@ const updateFutsal = async (req, res) => {
       futsalImageUrl = `${process.env.BACKEND_URL}/uploads/${uploadedImage}`;
     }
 
-    const existingTimeSlots = futsal.timeSlots;
-    futsal.timeSlots = [];
-    await futsal.save();
-
-    await TimeSlot.deleteMany({ _id: { $in: existingTimeSlots } });
-
-    const slots = generateTimeSlots(dayOfWeek, startTime, endTime);
-    const savedSlots = await TimeSlot.insertMany(
-      slots.map((slot) => ({ ...slot, futsal: futsal._id }))
-    );
-
     futsal.name = name;
     futsal.location = location;
     futsal.price = price;
@@ -241,7 +205,6 @@ const updateFutsal = async (req, res) => {
     futsal.startTime = startTime;
     futsal.endTime = endTime;
     futsal.futsalImageUrl = futsalImageUrl;
-    futsal.timeSlots = savedSlots.map((slot) => slot._id);
 
     await futsal.save();
 

@@ -12,4 +12,6 @@ router.get('/countForGraph', authGuard, ensureSuperAdmin, vendorController.vendo
 
 router.get('/countAndGrowth', authGuard, ensureSuperAdmin, vendorController.vendorCountAndGrowthRate);
 
+router.get('/blockUnblock/:id', authGuard, ensureSuperAdmin, vendorController.blockUnblockUserAndVendor);
+
 module.exports = router;

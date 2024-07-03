@@ -3,6 +3,7 @@ const authGuard = require("../../../middleware/authGuard");
 const upload = require("../../../middleware/upload");
 const futsalController = require("../../../controllers/admin/vendor/futsalControllers");
 const ensureVendor = require("../../../middleware/ensureVendor");
+const ensureSuperAdmin = require("../../../middleware/ensureSuperAdmin");
 
 router.post("/add", authGuard, ensureVendor, upload.single("futsalImage"), futsalController.createFutsal);
 

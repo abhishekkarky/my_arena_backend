@@ -175,9 +175,30 @@ const vendorCountAndGrowthRate = async (req, res) => {
   }
 };
 
+const blockUnblockUserAndVendor = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const userData = await users.findById(userId);
+    await users.findByIdAndUpdate(userId, {
+      isBlocked: !userData.isBlocked,
+    });
+    res.json({
+      success: true,
+      message: "User block status changed",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   getCountryVendor,
   getAllVendorsForAdmin,
   vendorCountForGraph,
   vendorCountAndGrowthRate,
+  blockUnblockUserAndVendor,
 };

@@ -61,7 +61,15 @@ const userSchema = mongoose.Schema(
     totalFutsals: {
       type: Number,
       default: 0,
-    }
+    },
+    totalBookings: {
+      type: Number,
+      default: 0,
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

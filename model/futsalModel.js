@@ -31,15 +31,16 @@ const futsalSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
-    timeSlots: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: "timeSlots",
-    },
-    dayOfWeek: {
-      type: Number,
-      min: 0,
-      max: 6,
-    },
+    timeSlots: [
+      {
+        type: String,
+      },
+    ],
+    dayOfWeek: [
+      {
+        type: String,
+      },
+    ],
     startTime: {
       type: String,
     },

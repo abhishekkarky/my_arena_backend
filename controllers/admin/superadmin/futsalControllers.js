@@ -90,7 +90,38 @@ const futsalCountAndGrowthRate = async (req, res) => {
   }
 };
 
+const deleteFutsal = async (req, res) => {
+  const futsalId = req.params.id;
+  if (!futsalId) {
+    return res.status(403).json({
+      success: false,
+      message: "Futsal not found",
+    });
+  }
+  try {
+    const futsal = await Futsal.findById(futsalId);
+    if (!futsal) {
+      return res.status(403).json({
+        success: false,
+        message: "Futsal not found",
+      });
+    }
+    await Futsal.findByIdAndDelete(futsalId);
+    res.status(200).json({
+      success: true,
+      message: "Futsal deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   getAllFutsalsForAdmin,
   futsalCountAndGrowthRate,
+  deleteFutsal
 };

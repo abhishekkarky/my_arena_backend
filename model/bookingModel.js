@@ -19,8 +19,7 @@ const bookingSchema = mongoose.Schema(
     },
     timeSlot: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "timeSlots",
+        type: String,
       },
     ],
     paid: {

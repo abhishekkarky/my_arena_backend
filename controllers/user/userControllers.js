@@ -189,7 +189,7 @@ const loginUser = async (req, res) => {
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
-        message: "Maximum login attempts exceeded. Account blocked.",
+        message: "Account suspended. Contact Admin.",
       });
     }
 
