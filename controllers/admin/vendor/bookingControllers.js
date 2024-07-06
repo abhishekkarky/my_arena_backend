@@ -42,7 +42,7 @@ const addBooking = async (req, res) => {
 
     await newBooking.save();
 
-    if (req.body.paid === 'true') {
+    if (req.body.paid === "true") {
       const populatedFutsal = await futsals.findOne({ _id: futsal });
       const newPaymentLog = new paymentLogs({
         by: checkUser._id,
@@ -240,10 +240,81 @@ const deleteBooking = async (req, res) => {
   }
 };
 
+const getBookingById = async (req, res) => {
+  const bookingId = req.params.id;
+  try {
+    const booking = await Bookings.findById(bookingId)
+      .populate("futsal")
+      .populate("user")
+      .populate("timeSlot");
+    if (!booking) {
+      return res.status(403).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      booking: booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+const updateBooking = async (req, res) => {
+  const bookingId = req.params.id;
+  const { user, futsal, date, timeSlot, paid } = req.body;
+  if (!bookingId) {
+    return res.status(403).json({
+      success: false,
+      message: "Booking not found",
+    });
+  }
+  try {
+    const existingBooking = await Bookings.findOne({
+      date: date,
+      timeSlot: timeSlot,
+    });
+
+    if (existingBooking) {
+      return res.status(403).json({
+        success: false,
+        message: "This timeslot is already booked",
+      });
+    }
+    const updateBookings = {
+      user: user,
+      futsal: futsal,
+      vendor: req.user.id,
+      date: date,
+      timeSlot: timeSlot,
+      paid: paid,
+    };
+    await Bookings.findByIdAndUpdate(bookingId, updateBookings);
+    res.status(200).json({
+      success: true,
+      message: "Booking updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   addBooking,
   getAllBookings,
   bookingCountForGraph,
   bookingCountAndGrowthRate,
   deleteBooking,
+  getBookingById,
+  updateBooking,
 };

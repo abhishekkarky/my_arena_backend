@@ -16,4 +16,8 @@ router.get('/timeSlotForBooking', authGuard, ensureVendor, timeSlotController.ge
 
 router.delete('/delete/:id', authGuard, ensureVendor, bookingController.deleteBooking);
 
+router.get('/get/:id', authGuard, ensureVendor, bookingController.getBookingById);
+
+router.put('/update/:id', authGuard, ensureVendor, bookingController.updateBooking);
+
 module.exports = router;
