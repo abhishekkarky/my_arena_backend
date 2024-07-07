@@ -6,9 +6,9 @@ const notificationSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
     },
-    futsal: {
+    booking: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "futsals",
+      ref: "bookings",
     },
     isRead: {
       type: Boolean,

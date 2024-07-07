@@ -242,17 +242,17 @@ const deleteBooking = async (req, res) => {
 
 const getBookingById = async (req, res) => {
   const bookingId = req.params.id;
+  if (!bookingId) {
+    return res.status(403).json({
+      success: false,
+      message: "Booking id not found",
+    });
+  }
   try {
     const booking = await Bookings.findById(bookingId)
       .populate("futsal")
       .populate("user")
       .populate("timeSlot");
-    if (!booking) {
-      return res.status(403).json({
-        success: false,
-        message: "Booking not found",
-      });
-    }
     res.status(200).json({
       success: true,
       booking: booking,
@@ -269,6 +269,7 @@ const getBookingById = async (req, res) => {
 const updateBooking = async (req, res) => {
   const bookingId = req.params.id;
   const { user, futsal, date, timeSlot, paid } = req.body;
+  console.log(req.body);
   if (!bookingId) {
     return res.status(403).json({
       success: false,
@@ -276,6 +277,7 @@ const updateBooking = async (req, res) => {
     });
   }
   try {
+    const checkUser = await users.findOne({ number: user });
     const existingBooking = await Bookings.findOne({
       date: date,
       timeSlot: timeSlot,
@@ -288,7 +290,7 @@ const updateBooking = async (req, res) => {
       });
     }
     const updateBookings = {
-      user: user,
+      user: checkUser._id,
       futsal: futsal,
       vendor: req.user.id,
       date: date,
