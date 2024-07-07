@@ -14,6 +14,7 @@ const futsalSchema = mongoose.Schema(
     },
     rating: {
       type: Number,
+      default: 1,
     },
     groundSize: {
       type: String,

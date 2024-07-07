@@ -66,35 +66,14 @@ app.use('/api/superadmin/booking', require('./routes/admin/superadmin/bookingRou
 // creating notification routes for superadmin
 app.use('/api/superadmin/notification', require('./routes/admin/superadmin/notificationRoutes'))
 
-// // creating subscriber routes
-// app.use("/api/subscriber", require("./routes/subscriberRoutes"));
+// creating booking routes for user
+app.use('/api/user/bookings', require('./routes/user/bookingRoutes'))
 
-// // Creating group routes
-// app.use("/api/group", require("./routes/groupRoutes"));
+// creating notification routes for user
+app.use('/api/user/notification', require('./routes/user/notificationRoutes'))
 
-// // Creating broadcast routes
-// app.use("/api/broadcast", require("./routes/broadcastRoutes"));
-
-// // Creating notification routes
-// app.use("/api/notification", require("./routes/notificationRoutes"));
-
-// // Creating unsubscriber routes
-// app.use("/api/unsubscriber", require("./routes/unsubscriberRoute"));
-
-// // admin dashboard routes
-// app.use("/api/admin/dashboard", require("./routes/admin/dashboardRoutes"));
-
-// // admin userlist routes
-// app.use("/api/admin/userlist", require("./routes/admin/userlistRoutes"));
-
-// // editor routes
-// app.use("/api/editor", require("./routes/editorRoutes"));
-
-// // visit log routes
-// app.use("/api/admin/visit", require("./routes/admin/visitRoutes"));
-
-// // mailing list routes
-// app.use("/api/admin/mailingList", require("./routes/admin/mailingListRoutes"));
+// creating futsal routes for user
+app.use('/api/user/futsal', require('./routes/user/futsalRoutes'))
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
