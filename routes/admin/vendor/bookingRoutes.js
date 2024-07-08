@@ -12,7 +12,7 @@ router.get('/countForGraph', authGuard, ensureVendor, bookingController.bookingC
 
 router.get('/countAndGrowth', authGuard, ensureVendor, bookingController.bookingCountAndGrowthRate);
 
-router.get('/timeSlotForBooking', authGuard, ensureVendor, timeSlotController.getAllTimeSlotForBooking);
+router.get('/timeSlotForBooking', authGuard, timeSlotController.getAllTimeSlotForBooking);
 
 router.delete('/delete/:id', authGuard, ensureVendor, bookingController.deleteBooking);
 

@@ -3,6 +3,7 @@ const moment = require("moment");
 
 const getAllTimeSlotForBooking = async (req, res) => {
   const { futsalId, date } = req.query;
+  console.log(req.query)
 
   try {
     const futsal = await futsals.findById(futsalId);
@@ -46,6 +47,7 @@ const getAllTimeSlotForBooking = async (req, res) => {
       });
       currentTime = currentTime.add(1, "hour");
     }
+    console.log(timeSlots);
     res.status(200).json({ success: true, timeSlots });
   } catch (error) {
     console.error(error);

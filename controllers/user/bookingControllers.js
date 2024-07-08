@@ -1,4 +1,7 @@
 const Bookings = require("../../model/bookingModel");
+const futsals = require("../../model/futsalModel");
+const paymentLogs = require("../../model/paymentLogsModel");
+const users = require("../../model/userModel");
 
 const getAllBookings = async (req, res) => {
   const userId = req.user.id;
@@ -49,6 +52,69 @@ const getAllBookings = async (req, res) => {
   }
 };
 
+const createBooking = async (req, res) => {
+  const userId = req.user.id;
+  const { futsal, date, timeSlot, paid } = req.body;
+  console.log(req.body)
+
+  try {
+    const futsalData = await futsals.findById(futsal).populate("addedBy");
+    const vendor = futsalData.addedBy._id;
+    console.log(vendor)
+
+    const existingBooking = await Bookings.findOne({
+      date: date,
+      timeSlot: timeSlot,
+    });
+
+    if (existingBooking) {
+      return res.status(403).json({
+        success: false,
+        message: "This timeslot is already booked",
+      });
+    }
+
+    const newBooking = new Bookings({
+      user: userId,
+      futsal: futsal,
+      vendor: vendor,
+      date: date,
+      timeSlot: timeSlot,
+      paid: paid,
+    });
+
+    await newBooking.save();
+
+    if (req.body.paid === "true") {
+      const populatedFutsal = await futsals.findOne({ _id: futsal });
+      const newPaymentLog = new paymentLogs({
+        by: userId,
+        vendor: vendor,
+        futsal: futsal,
+        amount: populatedFutsal.price,
+      });
+      await newPaymentLog.save();
+    }
+
+    await users.findByIdAndUpdate(userId, {
+      $inc: { totalBookings: 1 },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Booking created successfully",
+      booking: newBooking,
+    });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
-    getAllBookings
+    getAllBookings,
+    createBooking
 }
