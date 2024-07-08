@@ -2,6 +2,7 @@ const Bookings = require("../../model/bookingModel");
 const futsals = require("../../model/futsalModel");
 const paymentLogs = require("../../model/paymentLogsModel");
 const users = require("../../model/userModel");
+const Notification = require("../../model/notificationModel");
 
 const getAllBookings = async (req, res) => {
   const userId = req.user.id;
@@ -84,6 +85,12 @@ const createBooking = async (req, res) => {
     });
 
     await newBooking.save();
+
+    const newNotification = new Notification({
+      user: vendor,
+      booking: newBooking._id,
+    })
+    await newNotification.save()
 
     if (req.body.paid === "true") {
       const populatedFutsal = await futsals.findOne({ _id: futsal });
