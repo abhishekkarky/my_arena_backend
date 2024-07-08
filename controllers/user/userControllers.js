@@ -275,7 +275,7 @@ const getUserById = async (req, res) => {
     }
     res.status(200).json({
       success: true,
-      message: 'User Detail fetched successfully',
+      message: "User Detail fetched successfully",
       userDetail: user,
     });
   } catch (error) {
@@ -423,6 +423,94 @@ const updateUserPassword = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  try {
+    const { number } = req.body;
+
+    const user = await users.findOne({ number });
+
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const otp = generateOTP();
+
+    user.otp = otp;
+    user.otpTimestamp = moment().add(120, "seconds").valueOf();
+
+    const response = await sendSMS(
+      number,
+      `Your OTP code for My Arena is ${otp}. This code will expire in 2 minutes.`
+    );
+    if (response.success === true) {
+      res.status(200).json({
+        success: true,
+        message: "Please check your number for OTP.",
+      });
+      await user.save();
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "Couldnot send verification code. Please try again later.",
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { number, otp, newPassword } = req.body;
+
+    const user = await users.findOne({ number });
+
+    if (!user) {
+      return res
+        .status(403)
+        .json({ success: false, message: "User not found" });
+    }
+
+    if (!user.otp) {
+      return res.status(403).json({
+        success: false,
+        message: "Please enter OTP...",
+      });
+    }
+
+    if (user.otp !== otp) {
+      return res.status(403).json({ success: false, message: "Invalid OTP" });
+    }
+
+    if (moment(user.otpTimestamp).isBefore(moment())) {
+      return res.status(403).json({ success: false, message: "Expired OTP" });
+    }
+
+    const generateSalt = await bcrypt.genSalt(10);
+    const encryptedNewPassword = await bcrypt.hash(newPassword, generateSalt);
+
+    user.password = encryptedNewPassword;
+    user.isBlocked = false;
+    user.otp = undefined;
+    user.otpTimestamp = undefined;
+
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 const storeFCMToken = async (req, res) => {
   const { fcmToken } = req.body;
   const id = req.user.id;
@@ -466,4 +554,6 @@ module.exports = {
   updateUser,
   updateUserPassword,
   storeFCMToken,
+  forgotPassword,
+  resetPassword,
 };

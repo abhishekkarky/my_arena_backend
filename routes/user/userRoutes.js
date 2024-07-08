@@ -17,6 +17,10 @@ router.put("/editProfile/:id", userController.updateUser);
 
 router.put("/editPassword/:id", userController.updateUserPassword);
 
+router.post("/forgot-password", userController.forgotPassword);
+
+router.post("/reset-password", userController.resetPassword);
+
 router.put('/storeFCMToken', authGuard, userController.storeFCMToken);
 
 module.exports = router;
