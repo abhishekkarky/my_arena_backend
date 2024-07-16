@@ -23,4 +23,6 @@ router.post("/reset-password", userController.resetPassword);
 
 router.put('/storeFCMToken', authGuard, userController.storeFCMToken);
 
+router.post('/registerUser', userController.registerUser);
+
 module.exports = router;

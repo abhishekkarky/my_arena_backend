@@ -9,9 +9,11 @@ const userSchema = mongoose.Schema(
     fullName: {
       type: String,
     },
-    email: {
-      type: String,
-    },
+    // email: {
+    //   type: String,
+    //   default: "email@gmail.com",
+    //   unique: false,
+    // },
     address: {
       type: String,
     },

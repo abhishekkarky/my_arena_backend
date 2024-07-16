@@ -545,6 +545,41 @@ const storeFCMToken = async (req, res) => {
   }
 };
 
+const registerUser = async (req, res) => {
+  const { fullName, number, password } = req.body;
+  console.log(req.body);
+  if (!fullName || !number || !password) {
+    res.json({
+      success: false,
+      message: "Please enter all fields",
+    });
+  }
+  try {
+    const user = await users.findOne({ number: number });
+    if (user) {
+      res.json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+    const generateSalt = await bcrypt.genSalt(10);
+    const encryptedPassword = await bcrypt.hash(password, generateSalt);
+    const newUser = new users({
+      fullName,
+      number,
+      password: encryptedPassword,
+    });
+    await newUser.save();
+    res.json({ success: true, message: "User created successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -556,4 +591,5 @@ module.exports = {
   storeFCMToken,
   forgotPassword,
   resetPassword,
+  registerUser,
 };
